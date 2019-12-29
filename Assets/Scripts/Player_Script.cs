@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Player_Script : MonoBehaviour
 {
@@ -17,10 +19,14 @@ public class Player_Script : MonoBehaviour
 	public float checkRadius;
     public float jumpTimeCounter;
     public float totalJumpTime;
+	public float livesLeft = 5;
+	public float enemiesKilled = 0;
+	public float enemiesKilledCheckpoint;
 	public bool isJumping;
 	public bool canJump;
 	public bool jumpUp;
 	public bool jumpDown;
+	public bool gameOver;
 	public LayerMask ground;
 	public LayerMask enemy;
 	public Vector2 checkpoint;
@@ -35,27 +41,44 @@ public class Player_Script : MonoBehaviour
 	public GameObject bookPlat1;
 	public GameObject bookPlat2;
 	public GameObject bookPlat3;
+	public GameObject levelEndPanel;
 	public Rigidbody2D rb;
 	public Rigidbody2D gate1rb;
 	public Rigidbody2D gate2rb;
 	public Transform gate1Bottom;
 	public Transform gate2Bottom;
 	public Transform enemies;
+	public TextMeshProUGUI enemiesKilledScore;
+	public TextMeshProUGUI enemiesKilledEquation;
+	public TextMeshProUGUI livesLeftScore;
+	public TextMeshProUGUI livesLeftEquation;
+
 
 	public GameObject flag;
 	
 
     void Start()
     { 	//setting checkpoint and freezing player rotation
+		levelEndPanel.SetActive(false);
 		//checkpoint = player.transform.position;
 		checkpoint = new Vector2(415,15);
 		rb.freezeRotation = true;
+		gameOver = false;
+		enemiesKilledCheckpoint = enemiesKilled;
     }
 
     void FixedUpdate()
 	{	//player moving
-		moveDirection = Input.GetAxisRaw("Horizontal");
-		rb.velocity = new Vector2(moveDirection * speed, rb.velocity.y);
+		if (!gameOver)
+		{
+			moveDirection = Input.GetAxisRaw("Horizontal");
+			rb.velocity = new Vector2(moveDirection * speed, rb.velocity.y);
+		}	
+		else
+		{
+			moveDirection = 0;
+			rb.velocity = Vector2.zero;
+		}
 	}
 
     public void StopJumpAnim()
@@ -104,71 +127,76 @@ public class Player_Script : MonoBehaviour
 			jumpUp = false;
 		}
 
-        //short jump
-        if (!isJumping && (Input.GetButtonDown("Jump")))
+        if (!gameOver)
 		{
-            jumpTimeCounter = totalJumpTime;
-			canJump = true;
-			rb.velocity = new Vector2(rb.velocity.x, 10f);
-			jumpUp = true;
-			jumpDown = false;
-		}
-        //long jump
-        if (canJump && (Input.GetButton("Jump")))
-        {
-            if (jumpTimeCounter > 0)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-                jumpTimeCounter -= Time.deltaTime;
+			//short jump
+        	if (!isJumping && (Input.GetButtonDown("Jump")))
+			{
+         		jumpTimeCounter = totalJumpTime;
+				canJump = true;
+				rb.velocity = new Vector2(rb.velocity.x, 10f);
 				jumpUp = true;
 				jumpDown = false;
-            }
-            else 
-            {
-				canJump = false;
-				jumpDown = true;
+			}
+        	//long jump
+        	if (canJump && (Input.GetButton("Jump")))
+        	{
+           		if (jumpTimeCounter > 0)
+            	{
+            	    rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            	    jumpTimeCounter -= Time.deltaTime;
+					jumpUp = true;
+					jumpDown = false;
+            	}
+            	else 
+            	{
+					canJump = false;
+					jumpDown = true;
+					jumpUp = false;
+            	}
+        	}
+        	if (Input.GetButtonUp("Jump"))
+        	{
+            	canJump = false;
 				jumpUp = false;
-            }
-        }
-        if (Input.GetButtonUp("Jump"))
-        {
-            canJump = false;
-			jumpUp = false;
-			jumpDown = true;
-        }
+				jumpDown = true;
+        	}
 
-		if (Input.GetButton("Run") && !isJumping) //left shift to run
-		{
-			speed = 10f;
-		}
-		else if (Input.GetButtonUp("Run"))
-		{
-			speed = 5f;
-		}
-
-        if (moveDirection < 0) //player sprite changing direction
-		{
-			transform.localScale = new Vector2 (-.5f, .5f);
-		}
-        else if (moveDirection > 0)
-		{
-			transform.localScale = new Vector2(.5f, .5f);
-		}
-
-		if (transform.position.x == checkpoint.x) //enemies can't start moving immediately after player respawns
-		{
-        	clockScript.canMove = false;
-        	clockScript.touchedWall = false;
-            for (int i = 0; i < 7; i++)
+			if (Input.GetButton("Run") && !isJumping) //left shift to run
 			{
-				clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().canMove = false;
-				clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().touchedWall = false;
+				speed = 10f;
+			}
+			else if (Input.GetButtonUp("Run"))
+			{
+				speed = 5f;
+			}
+
+        	if (moveDirection < 0) //player sprite changing direction
+			{
+				transform.localScale = new Vector2 (-.5f, .5f);
+			}
+        	else if (moveDirection > 0)
+			{
+				transform.localScale = new Vector2(.5f, .5f);
+			}
+
+			if (transform.position.x == checkpoint.x) //enemies can't start moving immediately after player respawns
+			{
+        		clockScript.canMove = false;
+        		clockScript.touchedWall = false;
+        	    for (int i = 0; i < 7; i++)
+				{
+					clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().canMove = false;
+					clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().touchedWall = false;
+				}
 			}
 		}
     }
 
     public void Restart() //kill player and set them at checkpoint, reset various objects
     {
+		if (!gameOver)
+		{
         Debug.Log("restarting");
         transform.position = checkpoint;
         if (liftUp != null)
@@ -200,6 +228,8 @@ public class Player_Script : MonoBehaviour
         }
         clockScript.canMove = false;
         clockScript.touchedWall = false;
+		enemiesKilled = enemiesKilledCheckpoint;
+		}
     }
 
     void OnTriggerEnter2D(Collider2D trigger)
@@ -210,18 +240,24 @@ public class Player_Script : MonoBehaviour
 			trigger.gameObject.SetActive(false);
 			passedCheckpoint.SetActive(true);
 			passedCheckpoint.transform.position = trigger.gameObject.transform.position;
+			enemiesKilledCheckpoint = enemiesKilled;
 		}
 		else if (trigger.gameObject.CompareTag("Finish"))
 		{
 			EndLevel();
-			
 		}
 	}
 
 	public void EndLevel()
 	{
+		gameOver = true;
 		confettiSystem.Play();
-		//end level function (stop score counting down, add score and bonuses, menu)
+		levelEndPanel.SetActive(true);
+		enemiesKilledEquation.text = enemiesKilled.ToString() + "     x 100";
+		enemiesKilledScore.text = (enemiesKilled * 100).ToString();
+		livesLeftEquation.text = livesLeft.ToString() + "     x 100";
+		livesLeftScore.text = (livesLeft * 100).ToString();
+		//end level function (add score and bonuses, menu)
 	}
 
 	void OnTriggerStay2D (Collider2D trigger)

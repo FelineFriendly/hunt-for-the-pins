@@ -32,6 +32,7 @@ public class EnemyKillScript : MonoBehaviour
             playerRb.velocity = new Vector2(playerRb.velocity.x, 21f);
             playerScript.jumpUp = true;
             enemyDying = false;
+            playerScript.enemiesKilled += 1;
         }
     }
 
@@ -40,6 +41,7 @@ public class EnemyKillScript : MonoBehaviour
         if (other.gameObject.CompareTag("Player") && !enemyDying) //kill player if they touch enemy
         {
             playerScript.Restart();
+            playerScript.livesLeft -= 1;
         }
     }
 
