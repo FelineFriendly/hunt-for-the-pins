@@ -23,11 +23,7 @@ public class Score_Script : MonoBehaviour
         if (!playerScript.gameOver)
         {
             timer -= Time.deltaTime;
-            timerText.text = "Score: " + timer.ToString("F0");
-        }   
-        else
-        {
-            timeLeftScore.text = timer.ToString("F0");
+            timerText.text = "Time: " + timer.ToString("F0");
         }
     }
 }

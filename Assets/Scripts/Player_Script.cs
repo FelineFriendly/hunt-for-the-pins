@@ -8,9 +8,12 @@ public class Player_Script : MonoBehaviour
 {
 	//variable declaration!
 	public Procrastination_Script clockScript;
+	public Score_Script scoreScript;
 	public Animator playerAnim;
 	public Coroutine liftUp;
 	public ParticleSystem confettiSystem;
+	public ParticleSystem endScoreParts;
+	public ParticleSystem totalScoreSystem;
 	public int children;
 	public float myGravityScale;
 	public float speed;
@@ -52,6 +55,7 @@ public class Player_Script : MonoBehaviour
 	public TextMeshProUGUI enemiesKilledEquation;
 	public TextMeshProUGUI livesLeftScore;
 	public TextMeshProUGUI livesLeftEquation;
+	public TextMeshProUGUI totalScore;
 
 
 	public GameObject flag;
@@ -244,19 +248,34 @@ public class Player_Script : MonoBehaviour
 		}
 		else if (trigger.gameObject.CompareTag("Finish"))
 		{
-			EndLevel();
+			StartCoroutine("EndLevel");
 		}
 	}
 
-	public void EndLevel()
+	public IEnumerator EndLevel() //show score and end of level screen
 	{
 		gameOver = true;
 		confettiSystem.Play();
 		levelEndPanel.SetActive(true);
 		enemiesKilledEquation.text = enemiesKilled.ToString() + "     x 100";
-		enemiesKilledScore.text = (enemiesKilled * 100).ToString();
 		livesLeftEquation.text = livesLeft.ToString() + "     x 100";
+		endScoreParts.Play(); //score from time left
+		yield return new WaitForSeconds(1);
+		scoreScript.timeLeftScore.text = scoreScript.timer.ToString("F0");
+		yield return new WaitForSeconds(.75f);
+		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, 0); //score from enemies killed
+		endScoreParts.Play(); 
+		yield return new WaitForSeconds(1);
+		enemiesKilledScore.text = (enemiesKilled * 100).ToString();
+		yield return new WaitForSeconds(.75f);
+		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, -130); //score from lives left
+		endScoreParts.Play(); 
+		yield return new WaitForSeconds(1);
 		livesLeftScore.text = (livesLeft * 100).ToString();
+		yield return new WaitForSeconds(1.5f);
+		totalScoreSystem.Play();
+		yield return new WaitForSeconds(1);
+		totalScore.text = (scoreScript.timer + (enemiesKilled * 100) + (livesLeft * 100)).ToString("F0");
 		//end level function (add score and bonuses, menu)
 	}
 
