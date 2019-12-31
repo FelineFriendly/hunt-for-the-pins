@@ -9,6 +9,7 @@ public class EnemyKillScript : MonoBehaviour
     public Procrastination_Script clockScript;
     public Player_Script playerScript;
     public Rigidbody2D playerRb;
+    public Transform lives;
     public bool enemyDying;
 
     // Start is called before the first frame update
@@ -18,6 +19,7 @@ public class EnemyKillScript : MonoBehaviour
         feet = GameObject.Find("feetPos").GetComponent<BoxCollider2D>();
         clockScript = this.transform.parent.gameObject.GetComponent<Procrastination_Script>();
         playerScript = GameObject.Find("Player").GetComponent<Player_Script>();
+        lives = GameObject.Find("Lives").transform;
     }
 
     void OnTriggerEnter2D(Collider2D trigger)
@@ -38,10 +40,18 @@ public class EnemyKillScript : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Player") && !enemyDying) //kill player if they touch enemy
+        if (other.gameObject.CompareTag("Player") && !enemyDying) //kill player + lose life if they touch enemy
         {
-            playerScript.Restart();
-            playerScript.livesLeft -= 1;
+            if (playerScript.livesLeft != 0)
+            {
+                playerScript.Restart();
+                playerScript.livesLeft -= 1;
+                lives.GetChild(Mathf.RoundToInt(playerScript.livesLeft)).gameObject.SetActive(false);
+            }
+            else
+            {
+                //game over of some sort
+            }
         }
     }
 

@@ -263,12 +263,12 @@ public class Player_Script : MonoBehaviour
 		yield return new WaitForSeconds(1);
 		scoreScript.timeLeftScore.text = scoreScript.timer.ToString("F0");
 		yield return new WaitForSeconds(.75f);
-		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, 0); //score from enemies killed
+		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, 50); //score from enemies killed
 		endScoreParts.Play(); 
 		yield return new WaitForSeconds(1);
 		enemiesKilledScore.text = (enemiesKilled * 100).ToString();
 		yield return new WaitForSeconds(.75f);
-		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, -130); //score from lives left
+		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, -50); //score from lives left
 		endScoreParts.Play(); 
 		yield return new WaitForSeconds(1);
 		livesLeftScore.text = (livesLeft * 100).ToString();
