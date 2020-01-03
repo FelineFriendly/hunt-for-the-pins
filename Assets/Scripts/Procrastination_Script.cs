@@ -37,7 +37,7 @@ public class Procrastination_Script : MonoBehaviour
             {
                 if(i == 0)
                 {
-                    spawnX = 38;
+                    spawnX = 40;
                     spawnY = 9;
                 }
                 else if(i == 1)

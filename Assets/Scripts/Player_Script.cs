@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class Player_Script : MonoBehaviour
@@ -9,6 +10,7 @@ public class Player_Script : MonoBehaviour
 	//variable declaration!
 	public Procrastination_Script clockScript;
 	public Score_Script scoreScript;
+	public EnemyKillScript enemyKillScript;
 	public Animator playerAnim;
 	public Coroutine liftUp;
 	public ParticleSystem confettiSystem;
@@ -33,6 +35,7 @@ public class Player_Script : MonoBehaviour
 	public LayerMask ground;
 	public LayerMask enemy;
 	public Vector2 checkpoint;
+	public Vector2 startPoint;
 	public GameObject player;
 	public GameObject clock;
 	public GameObject passedCheckpoint;
@@ -45,6 +48,8 @@ public class Player_Script : MonoBehaviour
 	public GameObject bookPlat2;
 	public GameObject bookPlat3;
 	public GameObject levelEndPanel;
+	public RigidbodyConstraints2D oGGate1;
+	public RigidbodyConstraints2D oGGate2;
 	public Rigidbody2D rb;
 	public Rigidbody2D gate1rb;
 	public Rigidbody2D gate2rb;
@@ -64,11 +69,15 @@ public class Player_Script : MonoBehaviour
     void Start()
     { 	//setting checkpoint and freezing player rotation
 		levelEndPanel.SetActive(false);
-		//checkpoint = player.transform.position;
+		startPoint = player.transform.position;
+		//checkpoint = startPoint;
 		checkpoint = new Vector2(415,15);
 		rb.freezeRotation = true;
 		gameOver = false;
 		enemiesKilledCheckpoint = enemiesKilled;
+		oGGate1 = gate1rb.constraints;
+		oGGate2 = gate2rb.constraints;
+		
     }
 
     void FixedUpdate()
@@ -216,7 +225,7 @@ public class Player_Script : MonoBehaviour
 		bookPlat2.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
 		bookPlat3.SetActive(true);
 		bookPlat3.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-        clockScript.enemies.GetChild(0).position = new Vector2(17, 2);
+        clockScript.enemies.GetChild(0).position = new Vector2(19, 2);
 		clockScript.enemies.GetChild(1).position = new Vector2(38, 9);
         clockScript.enemies.GetChild(2).position = new Vector2(70, 2);
         clockScript.enemies.GetChild(3).position = new Vector2(304, 2);
@@ -310,6 +319,36 @@ public class Player_Script : MonoBehaviour
 			liftUp = StartCoroutine(MoveLift());
 		}
 	}
+
+	public void ReplayLevel() //reset level and replay it
+    {
+		levelEndPanel.SetActive(false);
+		checkpoint = startPoint;
+		gameOver = false;
+		livesLeft = 5;
+		enemiesKilled = 0;
+		enemiesKilledCheckpoint = enemiesKilled;
+		for (int i = 0; i < enemyKillScript.lives.childCount; i++)
+			enemyKillScript.lives.GetChild(i).gameObject.SetActive(true);
+		scoreScript.timer = 300.0f;
+		gate1.transform.position = new Vector2(gate1.transform.position.x, 30);
+		gate1rb.gravityScale = 0;
+		gate1rb.constraints = oGGate1;
+		gate2.transform.position = new Vector2(gate2.transform.position.x, 30);
+		gate2rb.gravityScale = 0;
+		gate2rb.constraints = oGGate2;
+		confettiSystem.Stop();
+		scoreScript.timeLeftScore.text = "";
+		enemiesKilledScore.text = "";
+		livesLeftScore.text = "";
+		totalScore.text = "";
+		Restart();
+	}
+
+	public void GoToLevels() //go to level select
+    {
+		SceneManager.LoadScene("Level Select");
+    }
 
 	IEnumerator MoveLift() //coroutine to start lift movement
 	{
