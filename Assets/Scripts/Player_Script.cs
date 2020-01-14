@@ -32,6 +32,7 @@ public class Player_Script : MonoBehaviour
 	public bool jumpUp;
 	public bool jumpDown;
 	public bool gameOver;
+	public bool particlesDone;
 	public LayerMask ground;
 	public LayerMask enemy;
 	public Vector2 checkpoint;
@@ -264,6 +265,7 @@ public class Player_Script : MonoBehaviour
 	public IEnumerator EndLevel() //show score and end of level screen
 	{
 		gameOver = true;
+		particlesDone = false;
 		confettiSystem.Play();
 		levelEndPanel.SetActive(true);
 		enemiesKilledEquation.text = enemiesKilled.ToString() + "     x 100";
@@ -285,7 +287,8 @@ public class Player_Script : MonoBehaviour
 		totalScoreSystem.Play();
 		yield return new WaitForSeconds(1);
 		totalScore.text = (scoreScript.timer + (enemiesKilled * 100) + (livesLeft * 100)).ToString("F0");
-		//end level function (add score and bonuses, menu)
+		particlesDone = true;
+		//end level function (add score and bonuses, high score, menu)
 	}
 
 	void OnTriggerStay2D (Collider2D trigger)
@@ -322,32 +325,38 @@ public class Player_Script : MonoBehaviour
 
 	public void ReplayLevel() //reset level and replay it
     {
-		levelEndPanel.SetActive(false);
-		checkpoint = startPoint;
-		gameOver = false;
-		livesLeft = 5;
-		enemiesKilled = 0;
-		enemiesKilledCheckpoint = enemiesKilled;
-		for (int i = 0; i < enemyKillScript.lives.childCount; i++)
-			enemyKillScript.lives.GetChild(i).gameObject.SetActive(true);
-		scoreScript.timer = 300.0f;
-		gate1.transform.position = new Vector2(gate1.transform.position.x, 30);
-		gate1rb.gravityScale = 0;
-		gate1rb.constraints = oGGate1;
-		gate2.transform.position = new Vector2(gate2.transform.position.x, 30);
-		gate2rb.gravityScale = 0;
-		gate2rb.constraints = oGGate2;
-		confettiSystem.Stop();
-		scoreScript.timeLeftScore.text = "";
-		enemiesKilledScore.text = "";
-		livesLeftScore.text = "";
-		totalScore.text = "";
-		Restart();
+		if(particlesDone)
+		{
+			levelEndPanel.SetActive(false);
+			checkpoint = startPoint;
+			gameOver = false;
+			livesLeft = 5;
+			enemiesKilled = 0;
+			enemiesKilledCheckpoint = enemiesKilled;
+			for (int i = 0; i < enemyKillScript.lives.childCount; i++)
+				enemyKillScript.lives.GetChild(i).gameObject.SetActive(true);
+			scoreScript.timer = 300.0f;
+			gate1.transform.position = new Vector2(gate1.transform.position.x, 30);
+			gate1rb.gravityScale = 0;
+			gate1rb.constraints = oGGate1;
+			gate2.transform.position = new Vector2(gate2.transform.position.x, 30);
+			gate2rb.gravityScale = 0;
+			gate2rb.constraints = oGGate2;
+			confettiSystem.Stop();
+			scoreScript.timeLeftScore.text = "";
+			enemiesKilledScore.text = "";
+			livesLeftScore.text = "";
+			totalScore.text = "";
+			Restart();
+		}
 	}
 
 	public void GoToLevels() //go to level select
     {
-		SceneManager.LoadScene("Level Select");
+		if (particlesDone)
+		{
+			SceneManager.LoadScene("Level Select");
+		}
     }
 
 	IEnumerator MoveLift() //coroutine to start lift movement
