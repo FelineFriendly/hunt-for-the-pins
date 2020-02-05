@@ -15,6 +15,7 @@ public class Score_Script : MonoBehaviour
     void Start()
     {
         playerScript = GetComponent<Player_Script>();
+        Destroy(GameObject.Find("Level Controller"));
     }
 
     // Update is called once per frame

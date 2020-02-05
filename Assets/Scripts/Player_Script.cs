@@ -27,16 +27,16 @@ public class Player_Script : MonoBehaviour
 	public float livesLeft = 5;
 	public float enemiesKilled = 0;
 	public float enemiesKilledCheckpoint;
-	public bool isJumping;
-	public bool canJump;
+	private bool isJumping;
+	private bool canJump;
 	public bool jumpUp;
-	public bool jumpDown;
+	private bool jumpDown;
 	public bool gameOver;
-	public bool particlesDone;
+	private bool particlesDone;
 	public LayerMask ground;
 	public LayerMask enemy;
-	public Vector2 checkpoint;
-	public Vector2 startPoint;
+	private Vector2 checkpoint;
+	private Vector2 startPoint;
 	public GameObject player;
 	public GameObject clock;
 	public GameObject passedCheckpoint;
@@ -49,6 +49,11 @@ public class Player_Script : MonoBehaviour
 	public GameObject bookPlat2;
 	public GameObject bookPlat3;
 	public GameObject levelEndPanel;
+	public GameObject levelFailedPanel;
+	public GameObject futureLevel;
+	public GameObject businessLevel;
+	public GameObject leaderLevel;
+	public GameObject americaLevel;
 	public RigidbodyConstraints2D oGGate1;
 	public RigidbodyConstraints2D oGGate2;
 	public Rigidbody2D rb;
@@ -62,24 +67,28 @@ public class Player_Script : MonoBehaviour
 	public TextMeshProUGUI livesLeftScore;
 	public TextMeshProUGUI livesLeftEquation;
 	public TextMeshProUGUI totalScore;
-
-
 	public GameObject flag;
-	
 
-    void Start()
+	private void Awake()
+	{
+		futureLevel = GameObject.FindWithTag("Future");
+		businessLevel = GameObject.FindWithTag("Business");
+		leaderLevel = GameObject.FindWithTag("Leader");
+		americaLevel = GameObject.FindWithTag("America");
+	}
+	void Start()
     { 	//setting checkpoint and freezing player rotation
 		levelEndPanel.SetActive(false);
+		levelFailedPanel.SetActive(false);
 		startPoint = player.transform.position;
-		//checkpoint = startPoint;
-		checkpoint = new Vector2(415,15);
+		checkpoint = startPoint;
+		//checkpoint = new Vector2(415,15);
 		rb.freezeRotation = true;
 		gameOver = false;
 		enemiesKilledCheckpoint = enemiesKilled;
 		oGGate1 = gate1rb.constraints;
 		oGGate2 = gate2rb.constraints;
-		
-    }
+	}
 
     void FixedUpdate()
 	{	//player moving
@@ -204,6 +213,13 @@ public class Player_Script : MonoBehaviour
 					clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().touchedWall = false;
 				}
 			}
+
+			if (scoreScript.timer <= 0 || livesLeft <= 0)
+			{
+				scoreScript.timer = 0;
+				LevelFailed();
+			}
+
 		}
     }
 
@@ -211,34 +227,33 @@ public class Player_Script : MonoBehaviour
     {
 		if (!gameOver)
 		{
-        Debug.Log("restarting");
-        transform.position = checkpoint;
-        if (liftUp != null)
-        {
-            StopAllCoroutines();
-            lift.transform.position = new Vector3(150, -1.85f, 0);
-        }
-		bookPlat.SetActive(true);
-		bookPlat.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-		bookPlat1.SetActive(true);
-		bookPlat1.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-		bookPlat2.SetActive(true);
-		bookPlat2.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-		bookPlat3.SetActive(true);
-		bookPlat3.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-        clockScript.enemies.GetChild(0).position = new Vector2(19, 2);
-		clockScript.enemies.GetChild(1).position = new Vector2(38, 9);
-        clockScript.enemies.GetChild(2).position = new Vector2(70, 2);
-        clockScript.enemies.GetChild(3).position = new Vector2(304, 2);
-        clockScript.enemies.GetChild(4).position = new Vector2(340.5f, 9.5f);
-        clockScript.enemies.GetChild(5).position = new Vector2(350, 2);
-        clockScript.enemies.GetChild(6).position = new Vector2(349, 15.5f);
-        clockScript.enemies.GetChild(7).position = new Vector2(340.5f, 24.5f);
-        clockScript.enemies.GetChild(8).position = new Vector2(386.3f, 2);
-        children = clockScript.enemies.childCount;
-        for (int i = 0; i < children; i++)
-        {
-            clockScript.enemies.GetChild(i).gameObject.SetActive(true);
+	        transform.position = checkpoint;
+		    if (liftUp != null)
+			{
+	            StopAllCoroutines();
+		        lift.transform.position = new Vector3(150, -1.85f, 0);
+			}
+			bookPlat.SetActive(true);
+			bookPlat.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
+			bookPlat1.SetActive(true);
+			bookPlat1.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
+			bookPlat2.SetActive(true);
+			bookPlat2.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
+			bookPlat3.SetActive(true);
+			bookPlat3.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
+			clockScript.enemies.GetChild(0).position = new Vector2(19, 2);
+			clockScript.enemies.GetChild(1).position = new Vector2(38, 9);
+		    clockScript.enemies.GetChild(2).position = new Vector2(70, 2);
+			clockScript.enemies.GetChild(3).position = new Vector2(304, 2);
+	        clockScript.enemies.GetChild(4).position = new Vector2(340.5f, 9.5f);
+		    clockScript.enemies.GetChild(5).position = new Vector2(350, 2);
+			clockScript.enemies.GetChild(6).position = new Vector2(349, 15.5f);
+	        clockScript.enemies.GetChild(7).position = new Vector2(340.5f, 24.5f);
+		    clockScript.enemies.GetChild(8).position = new Vector2(386.3f, 2);
+			children = clockScript.enemies.childCount;
+	        for (int i = 0; i < children; i++)
+		    {
+			    clockScript.enemies.GetChild(i).gameObject.SetActive(true);
         }
         clockScript.canMove = false;
         clockScript.touchedWall = false;
@@ -291,6 +306,12 @@ public class Player_Script : MonoBehaviour
 		//end level function (add score and bonuses, high score, menu)
 	}
 
+	public void LevelFailed() //player runs out of health or time
+	{
+		gameOver = true;
+		particlesDone = true;
+		levelFailedPanel.SetActive(true);
+	}
 	void OnTriggerStay2D (Collider2D trigger)
 	{
 		if (trigger.gameObject.tag == "Slope") //ability to slide
@@ -328,6 +349,7 @@ public class Player_Script : MonoBehaviour
 		if(particlesDone)
 		{
 			levelEndPanel.SetActive(false);
+			levelFailedPanel.SetActive(false);
 			checkpoint = startPoint;
 			gameOver = false;
 			livesLeft = 5;
@@ -355,6 +377,10 @@ public class Player_Script : MonoBehaviour
     {
 		if (particlesDone)
 		{
+			futureLevel.SetActive(true);
+			businessLevel.SetActive(true);
+			leaderLevel.SetActive(true);
+			americaLevel.SetActive(true);
 			SceneManager.LoadScene("Level Select");
 		}
     }
