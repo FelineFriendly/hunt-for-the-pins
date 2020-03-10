@@ -48,10 +48,6 @@ public class EnemyKillScript : MonoBehaviour
                 playerScript.livesLeft -= 1;
                 lives.GetChild(Mathf.RoundToInt(playerScript.livesLeft)).gameObject.SetActive(false);
             }
-            else
-            {
-                //game over of some sort
-            }
         }
     }
 

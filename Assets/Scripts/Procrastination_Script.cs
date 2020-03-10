@@ -7,6 +7,7 @@ public class Procrastination_Script : MonoBehaviour
     //variable declaration!
     public Player_Script playerScript;
     public Animator procrastinationAnim;
+    public int numOfEnemies;
     public float spawnX;
     public float spawnY;
     public bool visible;
@@ -33,51 +34,14 @@ public class Procrastination_Script : MonoBehaviour
         rb.freezeRotation = true;
         if(prefab) //instantiating enemies
         {
-            for (int i = 0; i < 8; i++)
-            {
-                if(i == 0)
-                {
-                    spawnX = 40;
-                    spawnY = 9;
-                }
-                else if(i == 1)
-                {
-                    spawnX = 69;
-                    spawnY = 2;
-                }
-                else if(i == 2)
-                {
-                    spawnX = 304;
-                    spawnY = 2;
-                }
-                else if(i == 3)
-                {
-                    spawnX = 340.5f;
-                    spawnY = 9.5f;
-                }
-                else if(i == 4)
-                {
-                    spawnX = 350;
-                    spawnY = 2;
-                }
-                else if(i == 5)
-                {
-                    spawnX = 349;
-                    spawnY = 15.5f;
-                }
-                else if(i == 6)
-                {
-                    spawnX = 340.5f;
-                    spawnY = 24.5f;
-                }
-                else if(i == 7)
-                {
-                    spawnX = 386.3f;
-                    spawnY = 2;
-                }
-                clone = Instantiate(prefab, new Vector3(spawnX, spawnY, 1), Quaternion.identity);
-                clone.transform.parent = enemies;
-            }
+            if (playerScript.futureLevel != null && playerScript.futureLevel.activeSelf)
+                FutureLevel();
+            else if (playerScript.businessLevel != null && playerScript.businessLevel.activeSelf)
+                BusinessLevel();
+            else if (playerScript.leaderLevel != null && playerScript.leaderLevel.activeSelf)
+                LeaderLevel();
+            else if (playerScript.americaLevel != null && playerScript.americaLevel.activeSelf)
+                AmericaLevel();
         }
     }
 
@@ -100,11 +64,6 @@ public class Procrastination_Script : MonoBehaviour
         {
             rb.velocity = Vector2.zero;
         }
-        //restart when R is pressed
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            playerScript.Restart();
-        }
     }
 
     //setting whether enemy is in camera and if it can move
@@ -121,6 +80,122 @@ public class Procrastination_Script : MonoBehaviour
         if (trigger == cameraView)
         {
             visible = false;
+        }
+    }
+
+    public void FutureLevel()
+    {
+        Debug.Log("FUTURE LEVEL");
+        numOfEnemies = 7;
+        this.transform.localPosition = new Vector2(19, 2);
+        for (int i = 0; i <= numOfEnemies; i++)
+        {
+            if (i == 0)
+            {
+                spawnX = 40;
+                spawnY = 9;
+            }
+            else if (i == 1)
+            {
+                spawnX = 69;
+                spawnY = 2;
+            }
+            else if (i == 2)
+            {
+                spawnX = 304;
+                spawnY = 2;
+            }
+            else if (i == 3)
+            {
+                spawnX = 340.5f;
+                spawnY = 9.5f;
+            }
+            else if (i == 4)
+            {
+                spawnX = 350;
+                spawnY = 2;
+            }
+            else if (i == 5)
+            {
+                spawnX = 349;
+                spawnY = 15.5f;
+            }
+            else if (i == 6)
+            {
+                spawnX = 340.5f;
+                spawnY = 24.5f;
+            }
+            else if (i == 7)
+            {
+                spawnX = 386.3f;
+                spawnY = 2;
+            }
+            clone = Instantiate(prefab, new Vector3(spawnX, spawnY, 1), Quaternion.identity);
+            clone.transform.parent = enemies;
+        }
+    }
+    public void BusinessLevel()
+    {
+        Debug.Log("BUSINESS LEVEL");
+        numOfEnemies = 3;
+        this.gameObject.SetActive(true);
+        this.transform.localPosition = new Vector2(27f, 7);
+        for (int i = 1; i <= numOfEnemies; i++)
+        {
+            if (i == 1)
+            {
+                spawnX = 47;
+                spawnY = 6;
+            }
+            if (i == 2)
+            {
+                spawnX = 70;
+                spawnY = 4;
+            }
+            if (i == 3)
+            {
+                spawnX = 92;
+                spawnY = 2;
+            }
+            clone = Instantiate(prefab, new Vector3(spawnX, spawnY, 1), Quaternion.identity);
+            clone.transform.parent = enemies;
+        }
+    }
+    public void LeaderLevel()
+    {
+        Debug.Log("LEADER LEVEL");
+        numOfEnemies = 0;
+        this.transform.localPosition = new Vector2(25, 5);
+        for (int i = 0; i <= numOfEnemies; i++)
+        {
+            if (i == 0)
+            {
+                spawnX = 20;
+                spawnY = 15;
+            }
+            clone = Instantiate(prefab, new Vector3(spawnX, spawnY, 1), Quaternion.identity);
+            clone.transform.parent = enemies;
+        }
+    }
+    public void AmericaLevel()
+    {
+        Debug.Log("AMERICA LEVEL");
+        numOfEnemies = 1;
+        this.transform.localPosition = new Vector2(27, 10);
+        for (int i = 0; i <= numOfEnemies; i++)
+        {
+            if (i == 0)
+            {
+                spawnX = 40;
+                spawnY = 9;
+            }
+            else if (i == 1)
+            {
+                spawnX = 60;
+                spawnY = 15;
+            }
+            clone = Instantiate(prefab, new Vector3(spawnX, spawnY, 1), Quaternion.identity);
+            clone.transform.parent = enemies;
         }
     }
 }

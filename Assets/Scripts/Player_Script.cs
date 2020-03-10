@@ -50,6 +50,8 @@ public class Player_Script : MonoBehaviour
 	public GameObject bookPlat3;
 	public GameObject levelEndPanel;
 	public GameObject levelFailedPanel;
+	public GameObject pausePanel;
+	public GameObject settings;
 	public GameObject futureLevel;
 	public GameObject businessLevel;
 	public GameObject leaderLevel;
@@ -80,6 +82,8 @@ public class Player_Script : MonoBehaviour
     { 	//setting checkpoint and freezing player rotation
 		levelEndPanel.SetActive(false);
 		levelFailedPanel.SetActive(false);
+		pausePanel.SetActive(false);
+		settings.SetActive(false);
 		startPoint = player.transform.position;
 		checkpoint = startPoint;
 		//checkpoint = new Vector2(415,15);
@@ -153,7 +157,7 @@ public class Player_Script : MonoBehaviour
         if (!gameOver)
 		{
 			//short jump
-        	if (!isJumping && (Input.GetButtonDown("Jump")))
+        	if (!isJumping && Input.GetButtonDown("Jump"))
 			{
          		jumpTimeCounter = totalJumpTime;
 				canJump = true;
@@ -162,7 +166,7 @@ public class Player_Script : MonoBehaviour
 				jumpDown = false;
 			}
         	//long jump
-        	if (canJump && (Input.GetButton("Jump")))
+        	if (canJump && Input.GetButton("Jump"))
         	{
            		if (jumpTimeCounter > 0)
             	{
@@ -177,7 +181,7 @@ public class Player_Script : MonoBehaviour
 					jumpDown = true;
 					jumpUp = false;
             	}
-        	}
+			}
         	if (Input.GetButtonUp("Jump"))
         	{
             	canJump = false;
@@ -207,10 +211,13 @@ public class Player_Script : MonoBehaviour
 			{
         		clockScript.canMove = false;
         		clockScript.touchedWall = false;
-        	    for (int i = 0; i < 7; i++)
+        	    for (int i = 0; i <= clockScript.numOfEnemies; i++)
 				{
-					clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().canMove = false;
-					clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().touchedWall = false;
+					if (clockScript.enemies.GetChild(i))
+					{
+						clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().canMove = false;
+						clockScript.enemies.GetChild(i).GetComponent<Procrastination_Script>().touchedWall = false;
+					}
 				}
 			}
 
@@ -220,6 +227,27 @@ public class Player_Script : MonoBehaviour
 				LevelFailed();
 			}
 
+			//restart when R is pressed
+			if (Input.GetKeyDown(KeyCode.R))
+			{
+				Restart();
+			}
+
+			if (!pausePanel.activeSelf && Input.GetKeyDown(KeyCode.P))
+			{
+				pausePanel.SetActive(true);
+				Time.timeScale = 0.0f;
+				particlesDone = true;
+			}
+			else if (pausePanel.activeSelf && Input.GetKeyDown(KeyCode.P))
+			{
+				Unpause();
+			}
+
+			if (Input.GetKeyDown(KeyCode.Escape))
+			{
+				QuitGame();
+			}
 		}
     }
 
@@ -227,29 +255,34 @@ public class Player_Script : MonoBehaviour
     {
 		if (!gameOver)
 		{
-	        transform.position = checkpoint;
-		    if (liftUp != null)
+			transform.position = checkpoint;
+			if (liftUp != null)
 			{
-	            StopAllCoroutines();
-		        lift.transform.position = new Vector3(150, -1.85f, 0);
+				StopAllCoroutines();
+				lift.transform.position = new Vector3(150, -1.85f, 0);
 			}
-			bookPlat.SetActive(true);
-			bookPlat.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-			bookPlat1.SetActive(true);
-			bookPlat1.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-			bookPlat2.SetActive(true);
-			bookPlat2.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-			bookPlat3.SetActive(true);
-			bookPlat3.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
-			clockScript.enemies.GetChild(0).position = new Vector2(19, 2);
-			clockScript.enemies.GetChild(1).position = new Vector2(38, 9);
-		    clockScript.enemies.GetChild(2).position = new Vector2(70, 2);
-			clockScript.enemies.GetChild(3).position = new Vector2(304, 2);
-	        clockScript.enemies.GetChild(4).position = new Vector2(340.5f, 9.5f);
-		    clockScript.enemies.GetChild(5).position = new Vector2(350, 2);
-			clockScript.enemies.GetChild(6).position = new Vector2(349, 15.5f);
-	        clockScript.enemies.GetChild(7).position = new Vector2(340.5f, 24.5f);
-		    clockScript.enemies.GetChild(8).position = new Vector2(386.3f, 2);
+			for (int i = 1; i <= clockScript.numOfEnemies; i++)
+			{
+				Destroy(clockScript.enemies.GetChild(i).gameObject);
+			}
+			if (futureLevel != null && futureLevel.activeSelf)
+			{
+				clockScript.FutureLevel();
+				bookPlat.SetActive(true);
+				bookPlat.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
+				bookPlat1.SetActive(true);
+				bookPlat1.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
+				bookPlat2.SetActive(true);
+				bookPlat2.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
+				bookPlat3.SetActive(true);
+				bookPlat3.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 255);
+			}
+			else if (businessLevel != null && businessLevel.activeSelf)
+				clockScript.BusinessLevel();
+			else if (leaderLevel != null && leaderLevel.activeSelf)
+				clockScript.LeaderLevel();
+			else if (americaLevel != null && americaLevel.activeSelf)
+				clockScript.AmericaLevel();
 			children = clockScript.enemies.childCount;
 	        for (int i = 0; i < children; i++)
 		    {
@@ -289,12 +322,12 @@ public class Player_Script : MonoBehaviour
 		yield return new WaitForSeconds(1);
 		scoreScript.timeLeftScore.text = scoreScript.timer.ToString("F0");
 		yield return new WaitForSeconds(.75f);
-		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, 50); //score from enemies killed
+		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, 130); //score from enemies killed
 		endScoreParts.Play(); 
 		yield return new WaitForSeconds(1);
 		enemiesKilledScore.text = (enemiesKilled * 100).ToString();
 		yield return new WaitForSeconds(.75f);
-		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, -50); //score from lives left
+		endScoreParts.transform.localPosition = new Vector2(endScoreParts.transform.localPosition.x, 30); //score from lives left
 		endScoreParts.Play(); 
 		yield return new WaitForSeconds(1);
 		livesLeftScore.text = (livesLeft * 100).ToString();
@@ -350,6 +383,8 @@ public class Player_Script : MonoBehaviour
 		{
 			levelEndPanel.SetActive(false);
 			levelFailedPanel.SetActive(false);
+			settings.SetActive(false);
+			Unpause();
 			checkpoint = startPoint;
 			gameOver = false;
 			livesLeft = 5;
@@ -384,6 +419,30 @@ public class Player_Script : MonoBehaviour
 			SceneManager.LoadScene("Level Select");
 		}
     }
+
+	public void Unpause()
+	{
+		pausePanel.SetActive(false);
+		Time.timeScale = 1.0f;
+		particlesDone = false;
+	}
+	public void Settings()
+	{
+		pausePanel.SetActive(false);
+		settings.SetActive(true);
+	}
+
+	public void Pause()
+	{
+		settings.SetActive(false);
+		pausePanel.SetActive(true);
+		Time.timeScale = 0.0f;
+		particlesDone = true;
+	}
+	public void QuitGame()
+	{
+		Application.Quit();
+	}
 
 	IEnumerator MoveLift() //coroutine to start lift movement
 	{
