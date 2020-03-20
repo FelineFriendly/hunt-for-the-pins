@@ -86,46 +86,47 @@ public class Procrastination_Script : MonoBehaviour
     public void FutureLevel()
     {
         Debug.Log("FUTURE LEVEL");
-        numOfEnemies = 7;
+        numOfEnemies = 8;
+        this.gameObject.SetActive(true);
         this.transform.localPosition = new Vector2(19, 2);
-        for (int i = 0; i <= numOfEnemies; i++)
+        for (int i = 1; i <= numOfEnemies; i++)
         {
-            if (i == 0)
+            if (i == 1)
             {
                 spawnX = 40;
                 spawnY = 9;
             }
-            else if (i == 1)
+            else if (i == 2)
             {
                 spawnX = 69;
                 spawnY = 2;
             }
-            else if (i == 2)
+            else if (i == 3)
             {
                 spawnX = 304;
                 spawnY = 2;
             }
-            else if (i == 3)
+            else if (i == 4)
             {
                 spawnX = 340.5f;
                 spawnY = 9.5f;
             }
-            else if (i == 4)
+            else if (i == 5)
             {
                 spawnX = 350;
                 spawnY = 2;
             }
-            else if (i == 5)
+            else if (i == 6)
             {
                 spawnX = 349;
                 spawnY = 15.5f;
             }
-            else if (i == 6)
+            else if (i == 7)
             {
                 spawnX = 340.5f;
                 spawnY = 24.5f;
             }
-            else if (i == 7)
+            else if (i == 8)
             {
                 spawnX = 386.3f;
                 spawnY = 2;
@@ -137,7 +138,7 @@ public class Procrastination_Script : MonoBehaviour
     public void BusinessLevel()
     {
         Debug.Log("BUSINESS LEVEL");
-        numOfEnemies = 3;
+        numOfEnemies = 7;
         this.gameObject.SetActive(true);
         this.transform.localPosition = new Vector2(27f, 7);
         for (int i = 1; i <= numOfEnemies; i++)
@@ -157,6 +158,26 @@ public class Procrastination_Script : MonoBehaviour
                 spawnX = 92;
                 spawnY = 2;
             }
+            if (i == 4)
+            {
+                spawnX = 175;
+                spawnY = 2;
+            }
+            if (i == 5)
+            {
+                spawnX = 205;
+                spawnY = 2;
+            }
+            if (i == 6)
+            {
+                spawnX = 235;
+                spawnY = 2;
+            }
+            if (i == 7)
+            {
+                spawnX = 330;
+                spawnY = 15.5f;
+            }
             clone = Instantiate(prefab, new Vector3(spawnX, spawnY, 1), Quaternion.identity);
             clone.transform.parent = enemies;
         }
@@ -164,11 +185,11 @@ public class Procrastination_Script : MonoBehaviour
     public void LeaderLevel()
     {
         Debug.Log("LEADER LEVEL");
-        numOfEnemies = 0;
+        numOfEnemies = 1;
         this.transform.localPosition = new Vector2(25, 5);
-        for (int i = 0; i <= numOfEnemies; i++)
+        for (int i = 1; i <= numOfEnemies; i++)
         {
-            if (i == 0)
+            if (i == 1)
             {
                 spawnX = 20;
                 spawnY = 15;
@@ -180,16 +201,16 @@ public class Procrastination_Script : MonoBehaviour
     public void AmericaLevel()
     {
         Debug.Log("AMERICA LEVEL");
-        numOfEnemies = 1;
+        numOfEnemies = 2;
         this.transform.localPosition = new Vector2(27, 10);
-        for (int i = 0; i <= numOfEnemies; i++)
+        for (int i = 2; i <= numOfEnemies; i++)
         {
-            if (i == 0)
+            if (i == 1)
             {
                 spawnX = 40;
                 spawnY = 9;
             }
-            else if (i == 1)
+            else if (i == 2)
             {
                 spawnX = 60;
                 spawnY = 15;

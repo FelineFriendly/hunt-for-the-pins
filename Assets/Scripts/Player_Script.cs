@@ -85,8 +85,8 @@ public class Player_Script : MonoBehaviour
 		pausePanel.SetActive(false);
 		settings.SetActive(false);
 		startPoint = player.transform.position;
-		checkpoint = startPoint;
-		//checkpoint = new Vector2(415,15);
+		//checkpoint = startPoint;
+		checkpoint = new Vector2(283,5);
 		rb.freezeRotation = true;
 		gameOver = false;
 		enemiesKilledCheckpoint = enemiesKilled;
@@ -304,9 +304,19 @@ public class Player_Script : MonoBehaviour
 			passedCheckpoint.transform.position = trigger.gameObject.transform.position;
 			enemiesKilledCheckpoint = enemiesKilled;
 		}
-		else if (trigger.gameObject.CompareTag("Finish"))
+		else if (trigger.gameObject.CompareTag("Finish")) //end level when finish flag is touched
 		{
 			StartCoroutine("EndLevel");
+		}
+
+		else if (trigger.gameObject.CompareTag("Lava")) //kill player if they touch lava
+		{
+			if (livesLeft != 0)
+			{
+				Restart();
+				livesLeft -= 1;
+				enemyKillScript.lives.GetChild(Mathf.RoundToInt(livesLeft)).gameObject.SetActive(false);
+			}
 		}
 	}
 
@@ -336,7 +346,6 @@ public class Player_Script : MonoBehaviour
 		yield return new WaitForSeconds(1);
 		totalScore.text = (scoreScript.timer + (enemiesKilled * 100) + (livesLeft * 100)).ToString("F0");
 		particlesDone = true;
-		//end level function (add score and bonuses, high score, menu)
 	}
 
 	public void LevelFailed() //player runs out of health or time
